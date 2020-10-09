@@ -228,7 +228,7 @@ uint32_t eval(int p,int q){
 			switch(tokens[op].type){
 			case POI:return swaddr_read(exp,4);
 			case NEG:return -exp;
-			case '!':return !exp;
+			case '!':return !(exp);
 			
 			}
 		}
