@@ -227,7 +227,7 @@ uint32_t eval(int p,int q){
 			uint32_t exp=eval(p+1,q);
 			switch(tokens[op].type){
 			case POI:return swaddr_read(exp,4);
-			case NEG:return -exp;
+			case NEG:return -(exp);
 			case '!':return !(exp);
 			
 			}
