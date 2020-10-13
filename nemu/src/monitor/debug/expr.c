@@ -261,11 +261,11 @@ uint32_t expr(char *e, bool *success) {
 	for(i=0;i<nr_token;i++){
 		if(tokens[i].type=='-'&&(i==0||(tokens[i-1].type!=DEX&&tokens[i-1].type!=HEX&&tokens[i-1].type!=')'))){
 			tokens[i].type=NEG;
-			tokens[i].priority=4;	
+			tokens[i].priority=6;	
 		}
 		if(tokens[i].type=='*'&&(i==0||(tokens[i-1].type!=DEX&&tokens[i-1].type!=HEX&&tokens[i-1].type!=')'))){
 			tokens[i].type=POI;
-			tokens[i].priority=4;
+			tokens[i].priority=6;
 		}
 	}
 	*success=true;
