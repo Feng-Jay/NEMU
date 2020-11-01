@@ -3,7 +3,7 @@
 #define instr cmp
 
 static void do_execute () {
-	DATA_TYPE ret = op_dest -> val - op_src -> val;
+    DATA_TYPE ret = op_dest -> val - op_src -> val;
     cpu.ZF = !ret;
     cpu.CF = op_dest -> val < op_src -> val;
     cpu.SF = ret >> ((DATA_BYTE << 3) - 1);

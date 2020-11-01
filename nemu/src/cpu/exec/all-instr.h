@@ -31,5 +31,6 @@
 #include "test/test.h"
 #include "je/je.h"
 #include "cmp/cmp.h"
+#include "pop/pop.h"
 
 
