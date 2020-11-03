@@ -48,3 +48,5 @@
 #include "jcc/jl.h"
 #include "jcc/jle.h"
 #include "jcc/jne.h"
+#include "jcc/js.h"
+#include "jcc/jns.h"
