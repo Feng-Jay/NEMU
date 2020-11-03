@@ -29,7 +29,7 @@
 #include "call/call.h"
 #include "push/push.h"
 #include "test/test.h"
-#include "je/je.h"
+#include "jcc/je.h"
 #include "cmp/cmp.h"
 #include "pop/pop.h"
 #include "ret/ret.h"
@@ -39,4 +39,5 @@
 #include "sbb/sbb.h"
 #include "setne/setne.h"
 #include "jmp/jmp.h"
+#include "jcc/ja.h"
 
