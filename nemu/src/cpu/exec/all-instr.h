@@ -45,4 +45,6 @@
 #include "jcc/jbe.h"
 #include "jcc/jg.h"
 #include "jcc/jge.h"
+#include "jcc/jl.h"
+#include "jcc/jle.h"
 
