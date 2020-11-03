@@ -51,3 +51,4 @@
 #include "jcc/js.h"
 #include "jcc/jns.h"
 #include "movs/movs.h"
+#include "stos/stos.h"
