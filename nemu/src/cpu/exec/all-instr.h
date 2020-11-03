@@ -43,4 +43,6 @@
 #include "jcc/jae.h"
 #include "jcc/jb.h"
 #include "jcc/jbe.h"
+#include "jcc/jg.h"
+#include "jcc/jge.h"
 
