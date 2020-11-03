@@ -36,4 +36,5 @@
 #include "add/add.h"
 #include "adc/adc.h"
 #include "sub/sub.h"
+#include "sbb/sbb.h"
 
