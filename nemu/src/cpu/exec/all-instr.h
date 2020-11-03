@@ -2,6 +2,10 @@
 
 #include "data-mov/mov.h"
 #include "data-mov/xchg.h"
+#include "data-mov/pop.h"
+#include "data-mov/push.h"
+#include "data-mov/movext.h"
+#include "data-mov/movs.h"
 
 #include "arith/dec.h"
 #include "arith/inc.h"
@@ -27,10 +31,9 @@
 #include "special/special.h"
 
 #include "call/call.h"
-#include "push/push.h"
+
 #include "test/test.h"
 #include "cmp/cmp.h"
-#include "pop/pop.h"
 #include "ret/ret.h"
 #include "add/add.h"
 #include "adc/adc.h"
@@ -50,7 +53,6 @@
 #include "jcc/jne.h"
 #include "jcc/js.h"
 #include "jcc/jns.h"
-#include "movs/movs.h"
 #include "stos/stos.h"
 #include "lods/lods.h"
 #include "scas/scas.h"
