@@ -70,14 +70,45 @@ FLOAT f2F(float a) {
 	 * stack. How do you retrieve it to another variable without
 	 * performing arithmetic operations on it directly?
 	 */
-
-	nemu_assert(0);
-	return 0;
+	void* temp=&a;
+	int val=*(uint32_t*)temp;
+	/*change float a to get sign and mantissa and exp*/
+	int sign=val&0x80000000;
+	int exp=(val>>23)&0xff;
+	int mantissa=val&0x7fffff;
+	/*judge 0,NAN,infinite*/
+	if(exp==0&&mantissa==0)
+	{
+		return 0;
+	}
+	if(exp=255)
+	{
+		if(sign)
+		return -0x7fffffff;
+		else
+		return 0x7fffffff;
+	}
+	/*deal with the normal situation*/
+	mantissa=mantissa|(1<<23);
+	if(exp>134)
+	{
+		mantissa=mantissa<<(exp-134)
+	}
+	else
+	{
+		mantissa=mantissa>>(134-exp);	
+	}
+	if(sign)
+	return -mantissa;
+	else 
+	return mantissa;
 }
 
 FLOAT Fabs(FLOAT a) {
-	nemu_assert(0);
-	return 0;
+	if(a<0)
+	return -a;
+	else
+	return a;
 }
 
 /* Functions below are already implemented */
