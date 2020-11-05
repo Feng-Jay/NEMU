@@ -54,7 +54,7 @@ FLOAT F_div_F(FLOAT a, FLOAT b) {
 		if(temp>=b)
 		{
 			temp-=b;
-			ans++;
+			ans|1;
 		}	
 	}
 	return ans*pon;
