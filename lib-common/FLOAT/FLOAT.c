@@ -71,7 +71,7 @@ FLOAT f2F(float a) {
 	 * performing arithmetic operations on it directly?
 	 */
 	void* temp=&a;
-	int val=*(uint32_t*)temp;
+	int val=*(int *)temp;
 	/*change float a to get sign and mantissa and exp*/
 	int sign=val&0x80000000;
 	int exp=(val>>23)&0xff;
@@ -92,7 +92,7 @@ FLOAT f2F(float a) {
 	mantissa=mantissa|(1<<23);
 	if(exp>134)
 	{
-		mantissa=mantissa<<(exp-134)
+		mantissa=mantissa<<(exp-134);
 	}
 	else
 	{
