@@ -1,4 +1,3 @@
-
 #include "cpu/exec/template-start.h"
 
 #define instr pop
@@ -6,7 +5,7 @@
 
 static void do_execute() {
     OPERAND_W(op_src,MEM_R(reg_l(R_ESP)));
-    //MEM_W(reg_l(R_ESP),0);
+    // MEM_W(reg_l(R_ESP),0);
     reg_l(R_ESP) += DATA_BYTE;
 
     print_asm_template1();
