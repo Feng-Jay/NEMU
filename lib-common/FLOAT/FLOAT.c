@@ -77,7 +77,7 @@ FLOAT f2F(float a) {
 	int exp=(val>>23)&0xff;
 	int mantissa=val&0x7fffff;
 	/*judge 0,NAN,infinite*/
-	if(exp==0)
+	if(exp==0&&mantissa==0)
 	{
 		return 0;
 	}
