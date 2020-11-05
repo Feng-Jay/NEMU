@@ -94,7 +94,7 @@ FLOAT f2F(float a) {
 	{
 		mantissa<<(exp-134);
 	}
-	else
+	else if(exp<134)
 	{
 		mantissa>>(134-exp);	
 	}
