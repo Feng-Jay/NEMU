@@ -1,15 +1,15 @@
 #include "FLOAT.h"
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
-	nemu_assert(0);
-	return 0;
+	long long ans=1ll*a*b;
+	return (ans>>16);
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
 	/* Dividing two 64-bit integers needs the support of another library
 	 * `libgcc', other than newlib. It is a dirty work to port `libgcc'
 	 * to NEMU. In fact, it is unnecessary to perform a "64/64" division
-	 * here. A "64/32" division is enough.
+	 * here. A "64/32" division is enough.1
 	 *
 	 * To perform a "64/32" division, you can use the x86 instruction
 	 * `div' or `idiv' by inline assembly. We provide a template for you
@@ -23,9 +23,41 @@ FLOAT F_div_F(FLOAT a, FLOAT b) {
 	 * It is OK not to use the template above, but you should figure
 	 * out another way to perform the division.
 	 */
-
-	nemu_assert(0);
-	return 0;
+	
+	/*as we konw , FLOAT sotre as int, you can just think it as int, but when it comes to calculate, there seem to be some questions.
+	  but we can use int'/', so There is a solution which make full use of int'/'*/
+	int pon=1;
+	if(a<0)
+	{
+		pon=pon*(-1);
+		a=a*(-1);
+	}
+	if(b<0)
+	{
+		pon=pon*(-1);
+		b=b*(-1);
+	}
+	/*just get rid of the peoblem of negative numbers
+	  so there are two positive numbers, much easiser!*/
+	
+	/*there are two situations
+	    1.a>=b, a/b>0, and we should let a/b go to before 16bits(FLOAT you konw)
+	    2.a<b , a/b=0, it should stay in the last 16bits
+	  so whatever, we must <<16*/
+	int ans=a/b;
+	int temp=a%b;
+	int i;
+	for(i=0;i<16;i++)
+	{
+		temp<<1;
+		ans<<1;
+		if(temp>=b)
+		{
+			temp-=b;
+			ans++;
+		}	
+	}
+	return ans*pon;
 }
 
 FLOAT f2F(float a) {
