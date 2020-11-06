@@ -7,7 +7,7 @@
 #include <regex.h>
 
 enum {
-	NOTYPE = 256, EQ,NEQ,AND,OR,HEX,DEX,NEG,POI,REG
+	NOTYPE = 256, EQ,NEQ,AND,OR,HEX,DEX,NEG,POI,REG,VAR
 
 	/* TODO: Add more token types */
 
@@ -26,6 +26,7 @@ static struct rule {
         {"\\b0[xX][0-9a-fA-F]+\\b",HEX,0},                       //HEX
         {"\\b[0-9]+\\b",DEX,0},                               //DEX
         {"\\$[a-zA-Z]+",REG,0},                          //register
+	{"\\b[a-zA-Z_0-9]+",VAR,0},			//variable
         {"!=",NEQ,3},                                   //not equal
 	{"!",'!',6},					//not
 	{"\\*",'*',5},                                  //MUL
