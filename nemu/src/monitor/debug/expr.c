@@ -5,6 +5,7 @@
  */
 #include <sys/types.h>
 #include <regex.h>
+#include <elf.h>
 
 enum {
 	NOTYPE = 256, EQ,NEQ,AND,OR,HEX,DEX,NEG,POI,REG,VAR
@@ -151,7 +152,7 @@ int dominant_operator(int p,int q){
 	int i;
 	int countt=0;
 	for(i=p;i<=q;i++){
-		if(tokens[i].type==HEX||tokens[i].type==DEX||tokens[i].type==REG)
+		if(tokens[i].type==HEX||tokens[i].type==DEX||tokens[i].type==REG||tokens[i].type==VAR)
 		continue;
 		if(tokens[i].type=='(')
 		countt++;
@@ -182,6 +183,10 @@ uint32_t eval(int p,int q){
 		sscanf(tokens[p].str,"%x",&outcome);
 		if(tokens[p].type==DEX)
 		sscanf(tokens[p].str,"%d",&outcome);
+		if(tokens[p].type==VAR)
+		{
+			
+		}
 		if(tokens[p].type==REG){
 			if(strlen(tokens[p].str)==3){
 				int i;
@@ -260,11 +265,11 @@ uint32_t expr(char *e, bool *success) {
 	/* TODO: Insert codes to evaluate the expression. */
 	int i;
 	for(i=0;i<nr_token;i++){
-		if(tokens[i].type=='-'&&(i==0||(tokens[i-1].type!=DEX&&tokens[i-1].type!=HEX&&tokens[i-1].type!=')'))){
+		if(tokens[i].type=='-'&&(i==0||(tokens[i-1].type!=DEX&&tokens[i-1].type!=HEX&&tokens[i-1].type!=VAR&&tokens[i-1].type!=')'))){
 			tokens[i].type=NEG;
 			tokens[i].priority=6;	
 		}
-		if(tokens[i].type=='*'&&(i==0||(tokens[i-1].type!=DEX&&tokens[i-1].type!=HEX&&tokens[i-1].type!=')'))){
+		if(tokens[i].type=='*'&&(i==0||(tokens[i-1].type!=DEX&&tokens[i-1].type!=HEX&&tokens[i-1].type!=VAR&&tokens[i-1].type!=')'))){
 			tokens[i].type=POI;
 			tokens[i].priority=6;
 		}
