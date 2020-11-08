@@ -37,7 +37,7 @@ uint32_t loader() {
 
 	/* Load each program segment */
 	int i;
-	ph = (void*)(elf -> e_phoff+buff);
+	ph = (void*)(elf -> e_phoff+buf);
 	for(i = 0; i < elf->e_phnum; i++) {
 		/* Scan the program header table, load each segment into memory */
 		if(ph->p_type == PT_LOAD) {
