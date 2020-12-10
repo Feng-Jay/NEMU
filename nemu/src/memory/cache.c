@@ -44,15 +44,22 @@ int read_cache2(hwaddr_t address)
 
     /*if the victimblock is dirty, we must write back*/
     if(cache2[victimblock].valid==1&&cache2[victimblock].dirty==1){
-        //uint32_t block2add=(group_id<<L2cache_bit_blockoffset)|(cache2[victimblock].tag<<(L2cache_bit_blockoffset+L2cache_bit_group));
+        uint32_t block2add=(group_id<<L2cache_bit_blockoffset)|(cache2[victimblock].tag<<(L2cache_bit_blockoffset+L2cache_bit_group));
         uint8_t append[BURST_LEN << 1];
         memset(append,1,sizeof(append));
-        for(i=0;i<L2cache_Size/BURST_LEN;i++){
-           // public_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i,append);
+        for(i=0;i<(L2cache_Size/BURST_LEN);i++){
+         public_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i,append);
         }
     }
-return 0;
-    /*read from memory*/
+    /*read from RAM*/
+    for(i=0;i<(L2cache_Size/BURST_LEN);i++){
+        public_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i);
+    }
+
+    cache2[victimblock].dirty=0;
+    cache2[victimblock].valid=1;
+    cache2[victimblock].tag=tag_id;
+    return victimblock;
 }
 
 int read_cache1(hwaddr_t address)
@@ -79,5 +86,27 @@ int read_cache1(hwaddr_t address)
     cache1[victimblock].valid=1;
     cache1[victimblock].tag=tag_id;
     return victimblock;
+
+}
+
+void write_cache2(hwaddr_t addr, size_t len, uint32_t data)
+{
+    uint32_t group=(addr>>L2cache_bit_blockoffset)&(L2cache_group_number-1);
+    uint32_t tag=(addr>>(L2cache_bit_blockoffset+L2cache_bit_group));
+    uint32_t offset=(addr&(L2cache_block_size-1));
+
+    int start_add=group* L2cache_way_number;
+    int i;
+    for(i=start_add;i<start_add+L2cache_way_number;i++){
+        /*write hit*/
+        if(cache2[i].valid==1&&cache2[i].tag==tag)
+        {
+            cache2[i].dirty=1;
+        }
+    }
+}
+
+void write_cache1(hwaddr_t addr, size_t len, uint32_t data)
+{
 
 }
