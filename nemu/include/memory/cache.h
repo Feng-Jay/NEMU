@@ -1,5 +1,6 @@
 #ifndef __CACHE_H_
 #define __CACHE_H_
+#include "common.h"
 
 #define L1cache_Size 65536
 #define L1cache_block_size 64   /*one line's size*/
@@ -11,12 +12,11 @@
 #define L1cache_bit_group 7      /*128=2^7*/
 #define L1cache_bit_way 3        /*8=2^3*/
 
-struct L1cache
-{
+typedef struct{
     uint8_t block[L1cache_block_size];
     uint32_t tag;
     bool valid;
-};
+}L1cache;
 
 L1cache cache1[L1cache_Size/L1cache_block_size];
 
@@ -32,13 +32,12 @@ L1cache cache1[L1cache_Size/L1cache_block_size];
 #define L2cache_bit_group 12      /*4096=2^12*/
 #define L2cache_bit_way 4        /*16=2^4*/
 
-struct L2cache
-{
+typedef struct {
     uint8_t block[L2cache_block_size];
     uint32_t tag;
     bool valid;
     bool dirty;
-};
+}L2cache;
 
 L2cache cache2[L2cache_Size/L2cache_block_size];
 
