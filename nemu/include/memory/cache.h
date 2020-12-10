@@ -2,6 +2,12 @@
 #define __CACHE_H_
 #include "common.h"
 
+#define Test
+
+#ifdef Test
+uint64_t used_time;
+#endif
+
 #define L1cache_Size 65536
 #define L1cache_block_size 64   /*one line's size*/
 

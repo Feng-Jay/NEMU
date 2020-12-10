@@ -6,6 +6,8 @@
 #include <stdio.h>
 
 void cache_ddr3_read(hwaddr_t addr, void* data);
+/*while in the dram.c, these two part is static. But I am afraid to remove the "static"
+key word. So I define two new int dram.c and state here to use them.*/
 void cache_ddr3_write(hwaddr_t addr, void* data, uint8_t *mask);
 
 void dram_write(hwaddr_t addr, size_t len, uint32_t data);
@@ -22,7 +24,7 @@ void ini_cache()
         cache2[i].valid=0;
         cache2[i].dirty=0;
     }
-
+    used_time=0;
 }
 
 int read_cache2(hwaddr_t address)
@@ -37,11 +39,17 @@ int read_cache2(hwaddr_t address)
         if(cache2[i].valid==1&&cache2[i].tag==tag_id)
         {
             /*hit cache2!*/
+            #ifndef TEST
+            used_time += 20;
+            #endif   
             return i;
         }
     }
 
     /*not hit read date from RAM*/
+    #ifndef TEST
+    used_time += 200;
+    #endif 
     srand(time(0));
     int victimblock=(rand()%L2cache_way_number)+group_address;
 
@@ -77,6 +85,9 @@ int read_cache1(hwaddr_t address)
         if(cache1[i].valid==1&&cache1[i].tag==tag_id)
         {
             /*hit cache1!*/
+            #ifndef TEST
+            used_time += 2;
+            #endif 
             return i;
         }
     }
