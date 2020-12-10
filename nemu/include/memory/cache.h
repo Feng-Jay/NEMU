@@ -41,4 +41,9 @@ typedef struct {
 
 L2cache cache2[L2cache_Size/L2cache_block_size];
 
+void ini_cache();
+int read_cache2(hwaddr_t address);
+int read_cache1(hwaddr_t address);
+void write_cache2(hwaddr_t addr, size_t len, uint32_t data);
+void write_cache1(hwaddr_t addr, size_t len, uint32_t data);
 #endif

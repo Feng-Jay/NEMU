@@ -1,4 +1,8 @@
 #include "common.h"
+#include "memory/cache.h"
+#include "burst.h"
+#include <string.h>
+#include "nemu.h"
 
 uint32_t dram_read(hwaddr_t, size_t);
 void dram_write(hwaddr_t, size_t, uint32_t);
@@ -6,11 +10,29 @@ void dram_write(hwaddr_t, size_t, uint32_t);
 /* Memory accessing interfaces */
 
 uint32_t hwaddr_read(hwaddr_t addr, size_t len) {
-	return dram_read(addr, len) & (~0u >> ((4 - len) << 3));
+	//return dram_read(addr, len) & (~0u >> ((4 - len) << 3));
+	uint32_t offset = addr & (L1cache_block_size - 1);
+	uint8_t temp[BURST_LEN << 1];
+
+	int start_address = read_cache1(addr);
+	
+
+	if(offset + len > L1cache_block_size){
+		memcpy(temp, cache1[start_address].block + offset, L1cache_block_size - offset);
+		int next_address = read_cache1(addr + L1cache_block_size - offset);
+		memcpy(temp + (L1cache_block_size - offset), cache1[next_address].block, len - (L1cache_block_size - offset));
+	}else{
+		memcpy(temp, cache1[start_address].block + offset, len);
+	}
+
+	int zero = 0;
+	uint32_t ans = unalign_rw(temp + zero, 4) & (~0u >> ((4 - len) << 3));
+	return ans;
 }
 
 void hwaddr_write(hwaddr_t addr, size_t len, uint32_t data) {
-	dram_write(addr, len, data);
+	//dram_write(addr, len, data);
+	write_cache1(addr,len,data);
 }
 
 uint32_t lnaddr_read(lnaddr_t addr, size_t len) {

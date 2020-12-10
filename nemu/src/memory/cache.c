@@ -5,7 +5,10 @@
 #include <time.h>
 #include <stdio.h>
 
+void cache_ddr3_read(hwaddr_t addr, void* data);
+void cache_ddr3_write(hwaddr_t addr, void* data, uint8_t *mask);
 
+void dram_write(hwaddr_t addr, size_t len, uint32_t data);
 void ini_cache()
 {
     /*set all the valid bit=0*/
@@ -30,7 +33,7 @@ int read_cache2(hwaddr_t address)
     int group_address=group_id*L2cache_way_number;
 
     int i;
-    for(i=0;i<group_address+L2cache_way_number;i++){
+    for(i=group_address;i<group_address+L2cache_way_number;i++){
         if(cache2[i].valid==1&&cache2[i].tag==tag_id)
         {
             /*hit cache2!*/
@@ -48,12 +51,12 @@ int read_cache2(hwaddr_t address)
         uint8_t append[BURST_LEN << 1];
         memset(append,1,sizeof(append));
         for(i=0;i<(L2cache_Size/BURST_LEN);i++){
-         public_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i,append);
+        cache_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i,append);
         }
     }
     /*read from RAM*/
     for(i=0;i<(L2cache_Size/BURST_LEN);i++){
-        public_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i);
+        cache_ddr3_read(group_address + BURST_LEN * i, cache2[i].block + BURST_LEN * i);
     }
 
     cache2[victimblock].dirty=0;
@@ -70,7 +73,7 @@ int read_cache1(hwaddr_t address)
     int group_address=group_id* L1cache_way_number;
 
     int i;
-    for(i=0;i<group_address+L1cache_way_number;i++){
+    for(i=group_address;i<group_address+L1cache_way_number;i++){
         if(cache1[i].valid==1&&cache1[i].tag==tag_id)
         {
             /*hit cache1!*/
@@ -89,7 +92,7 @@ int read_cache1(hwaddr_t address)
 
 }
 
-void write_cache2(hwaddr_t addr, size_t len, uint32_t data)
+void write_cache2(hwaddr_t addr, size_t len, uint32_t data)/*write back starget!!!!*/
 {
     uint32_t group=(addr>>L2cache_bit_blockoffset)&(L2cache_group_number-1);
     uint32_t tag=(addr>>(L2cache_bit_blockoffset+L2cache_bit_group));
@@ -102,11 +105,57 @@ void write_cache2(hwaddr_t addr, size_t len, uint32_t data)
         if(cache2[i].valid==1&&cache2[i].tag==tag)
         {
             cache2[i].dirty=1;
+            if(offset+len>L2cache_block_size)
+            {
+                memcpy(cache2[i].block+offset,&data,L2cache_block_size-offset);
+                write_cache2(addr+L2cache_block_size-offset, len-L2cache_block_size+offset,data>>(L2cache_block_size-offset));
+            }
+            else
+            {
+                memcpy(cache2[i].block+offset,&data,len);
+            }
+            return ;
         }
     }
+     /*if not hit, you must read it from RAM then rewrite it.*/
+     i=read_cache2(addr);
+     cache2[i].dirty=1;
+     memcpy(cache2[i].block+offset,&data,len);
 }
 
+/*easy code with write through*/
 void write_cache1(hwaddr_t addr, size_t len, uint32_t data)
 {
+    uint32_t group=(addr>>L1cache_bit_blockoffset)&(L1cache_group_number-1);
+    uint32_t tag=(addr>>(L1cache_bit_blockoffset+L1cache_bit_group));
+    uint32_t offset=(addr&(L1cache_block_size-1));
 
+    int start_add=group* L1cache_way_number;
+    int i;
+    for(i=start_add+0;i<start_add+L1cache_way_number;i++){
+        /*hit*/
+        if(cache1[i].valid==1&&cache1[i].tag==tag)
+        {
+            
+            if(offset+len>L1cache_block_size)
+            {
+                memcpy(cache1[i].block+offset,&data,L1cache_block_size-offset);
+                /*write the ram*/
+                dram_write(addr,L1cache_block_size - offset,data);
+                /*and L2 need refresh*/
+                write_cache2(addr, L1cache_block_size-offset,data);
+                /*write the left things*/
+                write_cache1(addr+L1cache_block_size-offset, len-L1cache_block_size+offset,data>>(L1cache_block_size-offset));
+            }
+            else
+            {
+                memcpy(cache1[i].block+offset,&data,len);
+                dram_write(addr,len,data);
+                write_cache2(addr,len,data);
+            }
+            return ;
+        }
+    }
+    /*not hit, then go to L2cache to look for*/
+    write_cache2(addr,len,data);
 }
