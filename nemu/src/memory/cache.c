@@ -50,21 +50,23 @@ int read_cache2(hwaddr_t address)
     #ifndef TEST
     used_time += 200;
     #endif 
-    srand(time(0));
+    srand((unsigned int)time(NULL));
     int victimblock=(rand()%L2cache_way_number)+group_address;
 
     /*if the victimblock is dirty, we must write back*/
     if(cache2[victimblock].valid==1&&cache2[victimblock].dirty==1){
         uint32_t block2add=(group_id<<L2cache_bit_blockoffset)|(cache2[victimblock].tag<<(L2cache_bit_blockoffset+L2cache_bit_group));
         uint8_t append[BURST_LEN << 1];
-        memset(append,1,sizeof(append));
-        for(i=0;i<(L2cache_Size/BURST_LEN);i++){
-        cache_ddr3_write(block2add+ BURST_LEN * i, cache2[i].block + BURST_LEN * i,append);
+        memset(append,1,sizeof append);
+        int j;
+        for(j=0;j<(L2cache_Size/BURST_LEN);j++){
+        cache_ddr3_write(block2add+ BURST_LEN * j, cache2[i].block + BURST_LEN * j,append);
         }
     }
     /*read from RAM*/
-    for(i=0;i<(L2cache_Size/BURST_LEN);i++){
-        cache_ddr3_read(group_address + BURST_LEN * i, cache2[i].block + BURST_LEN * i);
+    int k;
+    for(k=0;k<(L2cache_Size/BURST_LEN);k++){
+        cache_ddr3_read(group_address + BURST_LEN * k, cache2[i].block + BURST_LEN * k);
     }
 
     cache2[victimblock].dirty=0;
@@ -93,7 +95,7 @@ int read_cache1(hwaddr_t address)
     }
     /*Not hit, we must replace one block */
     int newblock=read_cache2(address);
-    srand(time(0));
+    srand((unsigned int)time(NULL));
     int victimblock=(rand()%L1cache_way_number)+group_address;
     /*cache1[victimblock].block=cache2[newblock].block;*/
     memcpy(cache1[victimblock].block,cache2[newblock].block,L1cache_block_size);
