@@ -111,7 +111,7 @@ void write_cache2(hwaddr_t addr, size_t len, uint32_t data)/*write back starget!
 
     int start_add=group* L2cache_way_number;
     int i;
-    for(i=start_add;i<start_add+L2cache_way_number;i++){
+    for(i=start_add+0;i<start_add+L2cache_way_number;i++){
         /*write hit*/
         if(cache2[i].valid==1&&cache2[i].tag==tag)
         {
@@ -150,9 +150,9 @@ void write_cache1(hwaddr_t addr, size_t len, uint32_t data)
             
             if(offset+len>L1cache_block_size)
             {
-                memcpy(cache1[i].block+offset,&data,L1cache_block_size-offset);
                 /*write the ram*/
                 dram_write(addr,L1cache_block_size - offset,data);
+                memcpy(cache1[i].block+offset,&data,L1cache_block_size-offset);
                 /*and L2 need refresh*/
                 write_cache2(addr, L1cache_block_size-offset,data);
                 /*write the left things*/
@@ -160,8 +160,8 @@ void write_cache1(hwaddr_t addr, size_t len, uint32_t data)
             }
             else
             {
-                memcpy(cache1[i].block+offset,&data,len);
                 dram_write(addr,len,data);
+                memcpy(cache1[i].block+offset,&data,len);
                 write_cache2(addr,len,data);
             }
             return ;
