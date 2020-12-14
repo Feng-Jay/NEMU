@@ -2,6 +2,7 @@
 #define __REG_H__
 
 #include "common.h"
+#include "../../../lib-common/x86-inc/cpu.h"
 
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
 enum { R_AX, R_CX, R_DX, R_BX, R_SP, R_BP, R_SI, R_DI };
@@ -14,14 +15,21 @@ enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
  * For more details about the register encoding scheme, see i386 manual.
  */
 
+typedef struct{
+	/*visiable*/
+	uint16_t selector;
+	/*hidden descriptor*/
+	uint32_t address;//information fetched
+	uint32_t limit;	 //from seg_descriptors.
+	uint16_t attribute;/*rwx*/
+}Seg_reg;
+
 typedef struct {
 
 //common reg
-union
-{
+union{
 
-	union 
-	{
+	union {
 		uint32_t _32;
 		uint16_t _16;
 		uint8_t _8[2];
@@ -29,8 +37,7 @@ union
 
 	/* Do NOT change the order of the GPRs' definitions. */
 
-	struct
-	{	
+	struct{	
 		uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
 		union{
 			struct{
@@ -52,15 +59,27 @@ union
 				uint32_t RF:	1;
 				uint32_t VM:	1;
 				uint32_t :	14;
-			      };
+			};
 				uint32_t EFLAGS;
-		   };
+		};
 	};
 
 };
+swaddr_t eip;
 
-	
-	swaddr_t eip;
+union{
+	struct {
+		Seg_reg CS,DS,ES,SS;
+	};
+	Seg_reg segment_reg[6];
+};	
+
+struct GDTR{
+	uint32_t base;
+	uint16_t limit;
+}GDTR;
+
+CR0 cr0;
 
 } CPU_state;
 
