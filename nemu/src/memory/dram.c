@@ -136,3 +136,4 @@ void dram_write(hwaddr_t addr, size_t len, uint32_t data) {
 		ddr3_write(addr + BURST_LEN, temp + BURST_LEN, mask + BURST_LEN);
 	}
 }
+

@@ -31,7 +31,7 @@ int read_cache2(hwaddr_t address)
 {
     uint32_t group_id=(address>>L2cache_bit_blockoffset)&(L2cache_group_number-1);
     uint32_t tag_id=(address >> (L2cache_bit_blockoffset+L2cache_bit_group));
-
+    uint32_t block_start = (address >> L2cache_bit_blockoffset) << L2cache_bit_blockoffset;
     int group_address=group_id*L2cache_way_number;
 
     int i;
@@ -66,7 +66,7 @@ int read_cache2(hwaddr_t address)
     /*read from RAM*/
     int k;
     for(k=0;k<(L2cache_Size/BURST_LEN);k++){
-        cache_ddr3_read(group_address + BURST_LEN * k, cache2[i].block + BURST_LEN * k);
+        cache_ddr3_read(block_start + BURST_LEN * k, cache2[i].block + BURST_LEN * k);
     }
 
     cache2[victimblock].dirty=0;
