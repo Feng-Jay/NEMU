@@ -4,9 +4,6 @@
 
 #define Test
 
-#ifdef Test
-uint64_t used_time;
-#endif
 
 #define L1cache_Size 65536
 #define L1cache_block_size 64   /*one line's size*/
@@ -44,6 +41,10 @@ typedef struct {
     bool valid;
     bool dirty;
 }L2cache;
+
+#ifdef Test
+int used_time;
+#endif
 
 L2cache cache2[L2cache_Size/L2cache_block_size];
 
