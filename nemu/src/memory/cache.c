@@ -35,7 +35,7 @@ int read_cache2(hwaddr_t address)
     int group_address=group_id*L2cache_way_number;
 
     int i;
-    for(i=group_address;i<group_address+L2cache_way_number;i++){
+    for(i=group_address;i<(group_address+L2cache_way_number);i++){
         if(cache2[i].valid==1&&cache2[i].tag==tag_id)
         {
             /*hit cache2!*/
@@ -59,7 +59,7 @@ int read_cache2(hwaddr_t address)
         uint8_t append[BURST_LEN << 1];
         memset(append,1,sizeof append);
         int j;
-        for(j=0;j<(L2cache_Size/BURST_LEN);j++){
+        for(j=0;j<(L2cache_block_size/BURST_LEN);j++){
         cache_ddr3_write(block2add+ BURST_LEN * j, cache2[i].block + BURST_LEN * j,append);
         }
     }
@@ -83,7 +83,7 @@ int read_cache1(hwaddr_t address)
     int group_address=group_id* L1cache_way_number;
 
     int i;
-    for(i=group_address;i<group_address+L1cache_way_number;i++){
+    for(i=group_address;i<(group_address+L1cache_way_number);i++){
         if(cache1[i].valid==1&&cache1[i].tag==tag_id)
         {
             /*hit cache1!*/
