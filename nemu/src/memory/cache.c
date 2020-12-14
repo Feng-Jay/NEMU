@@ -65,7 +65,7 @@ int read_cache2(hwaddr_t address)
     }
     /*read from RAM*/
     int k;
-    for(k=0;k<(L2cache_Size/BURST_LEN);k++){
+    for(k=0;k<(L2cache_block_size/BURST_LEN);k++){
         cache_ddr3_read(block_start + (BURST_LEN * k), cache2[i].block + (BURST_LEN * k));
     }
 
