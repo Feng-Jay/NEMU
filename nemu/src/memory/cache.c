@@ -176,8 +176,3 @@ void write_cache2(hwaddr_t addr, size_t len, uint32_t data){
     cache2[i].dirty = 1;
     memcpy(cache2[i].data + offset,&data,len);
 }
-
-
-
-
-
