@@ -11,6 +11,7 @@ key word. So I define two new int dram.c and state here to use them.*/
 void cache_ddr3_write(hwaddr_t addr, void* data, uint8_t *mask);
 
 void dram_write(hwaddr_t addr, size_t len, uint32_t data);
+
 void ini_cache()
 {
     /*set all the valid bit=0*/
