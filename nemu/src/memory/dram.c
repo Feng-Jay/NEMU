@@ -9,12 +9,10 @@
  * Note that cross addressing is not simulated.
  */
 
-/*This is the structer of ddr3, which I know about by reading CSAPP*/
-
-#define COL_WIDTH 10 //10
-#define ROW_WIDTH 10 //10
-#define BANK_WIDTH 3 //3
-#define RANK_WIDTH (27 - COL_WIDTH - ROW_WIDTH - BANK_WIDTH) //4
+#define COL_WIDTH 10
+#define ROW_WIDTH 10
+#define BANK_WIDTH 3
+#define RANK_WIDTH (27 - COL_WIDTH - ROW_WIDTH - BANK_WIDTH)
 
 typedef union {
 	struct {
@@ -32,7 +30,7 @@ typedef union {
 #define NR_BANK (1 << BANK_WIDTH)
 #define NR_RANK (1 << RANK_WIDTH)
 
-#define HW_MEM_SIZE (1 << (COL_WIDTH + ROW_WIDTH + BANK_WIDTH + RANK_WIDTH)) //max address
+#define HW_MEM_SIZE (1 << (COL_WIDTH + ROW_WIDTH + BANK_WIDTH + RANK_WIDTH))
 
 uint8_t dram[NR_RANK][NR_BANK][NR_ROW][NR_COL];
 uint8_t *hw_mem = (void *)dram;
@@ -64,7 +62,6 @@ static void ddr3_read(hwaddr_t addr, void *data) {
 	uint32_t row = temp.row;
 	uint32_t col = temp.col;
 
-	//if invalid read from buffer
 	if(!(rowbufs[rank][bank].valid && rowbufs[rank][bank].row_idx == row) ) {
 		/* read a row into row buffer */
 		memcpy(rowbufs[rank][bank].buf, dram[rank][bank][row], NR_COL);
@@ -72,13 +69,8 @@ static void ddr3_read(hwaddr_t addr, void *data) {
 		rowbufs[rank][bank].valid = true;
 	}
 
-	//else write data from ddr3
 	/* burst read */
 	memcpy(data, rowbufs[rank][bank].buf + col, BURST_LEN);
-}
-
-void cache_ddr3_read(hwaddr_t addr, void* data){
-	ddr3_read(addr, data);
 }
 
 static void ddr3_write(hwaddr_t addr, void *data, uint8_t *mask) {
@@ -105,8 +97,13 @@ static void ddr3_write(hwaddr_t addr, void *data, uint8_t *mask) {
 	memcpy(dram[rank][bank][row], rowbufs[rank][bank].buf, NR_COL);
 }
 
-void cache_ddr3_write(hwaddr_t addr, void *data, uint8_t *mask){
-	ddr3_write(addr, data, mask);
+void public_ddr3_write(hwaddr_t addr, void *data, uint8_t *mask)
+{
+	ddr3_write(addr,data,mask);
+}
+void public_ddr3_read(hwaddr_t addr, void *data)
+{
+	ddr3_read(addr, data);
 }
 
 uint32_t dram_read(hwaddr_t addr, size_t len) {
@@ -139,3 +136,4 @@ void dram_write(hwaddr_t addr, size_t len, uint32_t data) {
 		ddr3_write(addr + BURST_LEN, temp + BURST_LEN, mask + BURST_LEN);
 	}
 }
+
