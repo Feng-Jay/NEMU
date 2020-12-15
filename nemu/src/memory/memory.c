@@ -43,17 +43,27 @@ void lnaddr_write(lnaddr_t addr, size_t len, uint32_t data) {
 	hwaddr_write(addr, len, data);
 }
 
+lnaddr_t seg_translate(swaddr_t addr, size_t len, uint8_t sreg){
+	if(cpu.CR0.protect_enable == 0){
+		return addr;
+	}else{
+		return cpu.segment_reg[sreg].base+addr;
+	}
+}
+
 uint32_t swaddr_read(swaddr_t addr, size_t len) {
 #ifdef DEBUG
 	assert(len == 1 || len == 2 || len == 4);
 #endif
-	return lnaddr_read(addr, len);
+	lnaddr_t lnaddr=seg_translate(addr,len,sreg);
+	return lnaddr_read(lnaddr, len);
 }
 
 void swaddr_write(swaddr_t addr, size_t len, uint32_t data) {
 #ifdef DEBUG
 	assert(len == 1 || len == 2 || len == 4);
 #endif
-	lnaddr_write(addr, len, data);
+	lnaddr_t lnaddr=seg_translate(addr,len,sreg);
+	lnaddr_write(lnaddr, len, data);
 }
 
