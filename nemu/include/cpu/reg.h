@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "../../../lib-common/x86-inc/cpu.h"
-
+void sreg_load(uint8_t sreg_num);
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
 enum { R_AX, R_CX, R_DX, R_BX, R_SP, R_BP, R_SI, R_DI };
 enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
@@ -70,7 +70,7 @@ swaddr_t eip;
 
 union{
 	struct {
-		Segment_Reg CS,DS,ES,SS;
+		Segment_Reg CS,SS,DS,ES,FS,GS;
 	};
 	Segment_Reg segment_reg[6];
 };	
@@ -87,7 +87,53 @@ CR3 CR3;
 } CPU_state;
 
 extern CPU_state cpu;
+typedef struct{
+	union{
+		struct{
+			uint16_t limit1:		16;
+			uint16_t base1:			16;
+		};
+		uint32_t part1;
+	};
 
+	union{
+		struct{
+				uint32_t base2:		8;
+				uint32_t a:			1;
+				uint32_t type:		3;
+				uint32_t s:			1;
+				uint32_t dpl:		2;
+				uint32_t p:			1;
+				uint32_t limit2:	4;
+				uint32_t avl:		1;
+				uint32_t :			1;
+				uint32_t x:			1;
+				uint32_t g:			1;
+				uint32_t base3:		8;
+			};
+		uint32_t part2;
+		
+	};
+}SegmentDescriptor;
+
+typedef struct {
+	union {
+		struct {
+			uint32_t p 	:1;
+			uint32_t rw	:1;
+			uint32_t us	:1;
+			uint32_t 	:2;
+			uint32_t a	:1;
+			uint32_t d 	:1;
+			uint32_t 	:2;
+			uint32_t avail	:3;
+			uint32_t addr 	:20;
+		};
+		uint32_t val;
+	};
+}PageDescriptor;
+
+SegmentDescriptor *seg_desc;
 uint8_t current_sreg;
 
 static inline int check_reg_index(int index) {
