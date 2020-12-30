@@ -63,31 +63,46 @@ static int cmd_info(char *args) {
 	return 0;
 }
 
-static int cmd_x(char *args) {
-	TestCorrect(args == NULL);
-	char* tokens = strtok(args, " ");
-	int N, exprs;
-	sscanf(tokens, "%d", &N);
-	char* eps = tokens + strlen(tokens) + 1;
-	bool flag = true;
-	exprs = expr(eps, &flag);
-	TestCorrect(!flag);
-	int i;
-	for (i = 0; i < N; i++) {
-		printf("0x%08x\t0x%08x\n", exprs + i * 4, swaddr_read(exprs + i * 4, 4));
+ static int cmd_x(char *args){
+	if(args == NULL) return 0;
+	uint32_t num = 0, addr;
+	bool suc;
+	while(args[0] == ' ')++args;	//trim
+	while('0' <= args[0] && args[0] <= '9') num = (num << 3) + (num << 1) + (args[0] & 15), ++args;
+	//get number
+	uint8_t past_sreg = current_sreg;
+	current_sreg = R_DS;
+	addr = expr(args, &suc);
+	current_sreg = past_sreg;
+	if(!suc) {
+		printf("\033[1;31mInvalid expression\n\033[0m");
+		return 0;
+	}
+	while(num) {
+		printf("address 0x%x:", addr);
+		int i;
+		for(i = 0;i < 4; i++)printf(" 0x%x", swaddr_read(addr + i, 1));
+		printf("\n");
+		addr += 4;
+		--num;
 	}
 	return 0;
-}
+
+	}
 
 static int cmd_p(char *args) {
-	TestCorrect(args == NULL);
-	uint32_t ans;
-	bool flag;
-	ans = expr(args, &flag);
-	TestCorrect(!flag) 
-	else {
-		printf("%d\n", ans);
+	if(args == NULL) return 0;
+	bool suc;
+	uint8_t past_sreg = current_sreg;
+	current_sreg = R_DS;
+	uint32_t ans = expr(args, &suc);	//fix bugs
+	current_sreg = past_sreg;
+	if(!suc) {
+		printf("\033[1;31mInvalid expression\n\033[0m");
+		return 0;
 	}
+	//tokens;
+	printf("Expression %s : 0x%x\n", args, ans);
 	return 0;
 }
 
