@@ -8,9 +8,12 @@
 #define make_helper(name) int name(swaddr_t eip)
 
 static inline uint32_t instr_fetch(swaddr_t addr, size_t len) {
-	return swaddr_read(addr, len);
+	uint8_t past_sreg = current_sreg;
+	current_sreg = R_CS;
+	uint32_t res =  swaddr_read(addr, len);
+	current_sreg = past_sreg;
+	return res;
 }
-
 /* Instruction Decode and EXecute */
 static inline int idex(swaddr_t eip, int (*decode)(swaddr_t), void (*execute) (void)) {
 	/* eip is pointing to the opcode */
