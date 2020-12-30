@@ -75,10 +75,13 @@ static void load_entry() {
 	fclose(fp);
 }
 
-static void init_CR0()
-{
-	cpu.CR0.protect_enable=0;
-	cpu.CR0.paging=0;
+static void init_sreg(){
+	cpu.CR0.protect_enable = 0; //real mode
+	cpu.CR0.paging = 0; // page mode
+
+	// initialize CS register
+	cpu.CS.base = 0;
+	cpu.CS.limit = 0xffffffff;
 }
 
 void restart() {
@@ -98,6 +101,6 @@ void restart() {
 	init_ddr3();
 	/*ini cache*/
 	init_cache();
-	/*ini CR0*/
-	init_CR0();
+	/*ini sreg*/
+	init_sreg();
 }
