@@ -34,13 +34,39 @@ void hwaddr_write(hwaddr_t addr, size_t len, uint32_t data) {
 	//dram_write(addr, len, data);
 	write_cache1(addr,len,data);
 }
+hwaddr_t page_translate(lnaddr_t addr, size_t len) {
+	if(cpu.CR0.protect_enable && cpu.CR0.paging) {
+	//	printf("%x\n",addr);
+		hwaddr_t tmpad;
+		if((tmpad = readTLB(addr & 0xfffff000)) != -1) return (tmpad << 12) + (addr & 0xfff);
+		PageDescriptor dir, page;
+		uint32_t dir_offset = addr >> 22;
+		uint32_t page_offset = ((addr >> 12) & 0x3ff);
+		uint32_t offset = addr & 0xfff;
+		dir.val = hwaddr_read((cpu.CR3.page_directory_base << 12) + (dir_offset << 2), 4);
+		Assert(dir.p, "Invalid page. %x", addr);
+		page.val = hwaddr_read((dir.addr << 12) + (page_offset << 2), 4);
+		Assert(page.p, "Invalid page. %x", addr);
+	//	hwaddr_t hwaddr = (page.base << 12) + offset;
+		//Assert((hwaddr & 0xfff) + len == ((hwaddr + len) & 0xfff), "Fatal Error!!");
+		writeTLB(addr & 0xfffff000, page.addr);
+		return (page.addr << 12) + offset;
+	} else {
+		return addr;
+	}
+}
 
 uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
-	return hwaddr_read(addr, len);
+	/*To Avoid Potential Errors (len = 1 + 3)*/
+	assert(len == 1 || len == 2 || len == 4);
+	hwaddr_t hwaddr = page_translate(addr, len); 
+	return hwaddr_read(hwaddr, len);
 }
 
 void lnaddr_write(lnaddr_t addr, size_t len, uint32_t data) {
-	hwaddr_write(addr, len, data);
+	assert(len == 1 || len == 2 || len == 4);
+	hwaddr_t hwaddr = page_translate(addr, len); 
+	hwaddr_write(hwaddr, len, data);
 }
 
 lnaddr_t seg_translate(swaddr_t addr, size_t len, uint8_t sreg){
