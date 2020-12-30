@@ -18,13 +18,12 @@ enum { R_CS,R_SS,R_DS,R_ES,R_FS,R_GS };
  */
 
 typedef struct{
-	/*visiable*/
-	uint16_t selector;
-	/*hidden descriptor*/
-	uint32_t address;//information fetched
-	uint32_t limit;	 //from seg_descriptors.
-	uint16_t attribute;/*rwx*/
-}Seg_reg;
+	uint16_t selector;// visible
+	/*invisible*/
+	uint16_t attribute;//read,write,execute
+	uint32_t limit;
+	uint32_t base;
+}Segment_Reg;
 
 typedef struct {
 
@@ -71,9 +70,9 @@ swaddr_t eip;
 
 union{
 	struct {
-		Seg_reg CS,DS,ES,SS;
+		Segment_Reg CS,DS,ES,SS;
 	};
-	Seg_reg segment_reg[6];
+	Segment_Reg segment_reg[6];
 };	
 
 struct GDTR{
@@ -81,9 +80,9 @@ struct GDTR{
 	uint16_t limit;
 }GDTR;
 
-CR0 cr0;
+CR0 CR0;
 
-CR3 cr3;
+CR3 CR3;
 
 } CPU_state;
 
