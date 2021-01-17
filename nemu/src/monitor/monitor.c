@@ -76,15 +76,6 @@ static void load_entry() {
 	fclose(fp);
 }
 
-static void init_sreg(){
-	cpu.CR0.protect_enable = 0; //real mode
-	cpu.CR0.paging = 0; // page mode
-
-	// initialize CS register
-	cpu.CS.base = 0;
-	cpu.CS.limit = 0xffffffff;
-}
-
 void restart() {
 	/* Perform some initialization to restart a program */
 #ifdef USE_RAMDISK
@@ -97,13 +88,19 @@ void restart() {
 
 	/* Set the initial instruction pointer. */
 	cpu.eip = ENTRY_START;
+	cpu.eflags = 2;
+
+	cpu.cr0.val = cpu.cr3.val = 0;
+	
+	cpu.cs.cache.base = 0;
+	cpu.cs.cache.limit = 0xffffffff;
 
 	/* Initialize DRAM. */
 	init_ddr3();
+
 	// initialize cache
-	init_cache();
+	resetCache();
+
 	// initialize TLB
-	initTLB();
-	/*ini sreg*/
-	init_sreg();
+	resetTLB();
 }

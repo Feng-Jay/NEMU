@@ -205,4 +205,3 @@ void concat(write_operand_, SUFFIX) (Operand *op, DATA_TYPE src) {
 }
 
 #include "cpu/exec/template-end.h"
-

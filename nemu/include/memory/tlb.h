@@ -17,7 +17,7 @@ TLB tlb[TLB_SIZE];
 
 uint32_t readTLB(uint32_t tg);
 
-void initTLB();
+void resetTLB();
 
 void writeTLB(uint32_t tg, uint32_t page);
 
