@@ -1,45 +1,30 @@
-#ifndef __EXEC_HELPER_H__
-#define __EXEC_HELPER_H__
+#ifndef __HELPER_H__
+#define __HELPER_H__
 
-#include "cpu/helper.h"
-#include "cpu/decode/decode.h"
+#include "nemu.h"
+#include "cpu/decode/operand.h"
 
-#define make_helper_v(name) \
-	make_helper(concat(name, _v)) { \
-		return (ops_decoded.is_operand_size_16 ? concat(name, _w) : concat(name, _l)) (eip); \
-	}
+/* All function defined with 'make_helper' return the length of the operation. */
+#define make_helper(name) int name(swaddr_t eip)
 
-#define do_execute concat4(do_, instr, _, SUFFIX)
+static inline uint32_t instr_fetch(swaddr_t addr, size_t len) {
+	return swaddr_read(addr, len, R_CS);
+}
 
-#define make_instr_helper(type) \
-	make_helper(concat5(instr, _, type, _, SUFFIX)) { \
-		return idex(eip, concat4(decode_, type, _, SUFFIX), do_execute); \
-	}
+/* Instruction Decode and EXecute */
+static inline int idex(swaddr_t eip, int (*decode)(swaddr_t), void (*execute) (void)) {
+	/* eip is pointing to the opcode */
+	int len = decode(eip + 1);
+	execute();
+	return len + 1;	// "1" for opcode
+}
 
-extern char assembly[];
-#ifdef DEBUG
-#define print_asm(...) Assert(snprintf(assembly, 80, __VA_ARGS__) < 80, "buffer overflow!")
-#else
-#define print_asm(...)
-#endif
+/* shared by all helper function */
+extern Operands ops_decoded;
 
-#define print_asm_template1() \
-	print_asm(str(instr) str(SUFFIX) " %s", op_src->str)
+#define op_src (&ops_decoded.src)
+#define op_src2 (&ops_decoded.src2)
+#define op_dest (&ops_decoded.dest)
 
-#define print_asm_template2() \
-	print_asm(str(instr) str(SUFFIX) " %s,%s", op_src->str, op_dest->str)
-
-#define print_asm_template3() \
-	print_asm(str(instr) str(SUFFIX) " %s,%s,%s", op_src->str, op_src2->str, op_dest->str)
-
-#define print_asm_no_template1() \
-	print_asm(str(instr)" %s", op_src->str)
-
-#define print_asm_no_template2() \
-	print_asm(str(instr)" %s, %s", op_src->str, op_dest->str)
-
-#define print_asm_no_template3() \
-	print_asm(str(instr)" %s,%s,%s", op_src->str, op_src2->str, op_dest->str)
 
 #endif
-

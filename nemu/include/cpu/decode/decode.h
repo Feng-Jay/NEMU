@@ -62,4 +62,3 @@ void write_operand_w(Operand *, uint16_t);
 void write_operand_l(Operand *, uint32_t);
 
 #endif
-
