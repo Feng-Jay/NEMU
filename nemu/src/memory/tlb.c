@@ -12,7 +12,7 @@ uint32_t readTLB(uint32_t tg) {
     return -1; //invalid
 }
 
-void inittTLB() {
+void resetTLB() {
     int i;
     for ( i = 0; i < TLB_SIZE; i++)
     {
