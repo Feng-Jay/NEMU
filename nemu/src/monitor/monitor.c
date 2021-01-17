@@ -1,5 +1,6 @@
 #include "nemu.h"
 #include "memory/cache.h"
+#include "memory/tlb.h"
 
 #define ENTRY_START 0x100000
 
@@ -99,8 +100,10 @@ void restart() {
 
 	/* Initialize DRAM. */
 	init_ddr3();
-	/*ini cache*/
+	// initialize cache
 	init_cache();
+	// initialize TLB
+	initTLB();
 	/*ini sreg*/
 	init_sreg();
 }
